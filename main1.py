@@ -136,11 +136,39 @@ def initialize_database(DB_PATH):
 
 
 def create_gui():
+
     app = tk.Tk()
-    
-    # app.iconbitmap("assets/icon.ico")
     app.title("FOCUSS APPLICATION")
-    app.attributes("-fullscreen", True)
+    app.geometry("1200x700")  # Initial window size
+    app.minsize(900, 600)  # Minimum window size
+    app.configure(bg="white")
+
+    # Enable dragging functionality
+    def on_press(event):
+        app.x = event.x
+        app.y = event.y
+
+    def on_drag(event):
+        x = app.winfo_x() + (event.x - app.x)
+        y = app.winfo_y() + (event.y - app.y)
+        app.geometry(f"+{x}+{y}")
+
+    # Bind dragging events to the title bar
+    title_bar = tk.Frame(app, bg="black", relief="raised", bd=2)
+    title_bar.pack(fill=tk.X)
+    title_bar.bind("<ButtonPress-1>", on_press)
+    title_bar.bind("<B1-Motion>", on_drag)
+
+    # Upload button
+    upload_button = tk.Button(title_bar, text=" Upload ", command=handle_upload, bg="white", fg="black", width=10)
+    upload_button.pack(side=tk.LEFT, padx=10, pady=2)
+
+
+    # app = tk.Tk()
+    
+    # # app.iconbitmap("assets/icon.ico")
+    # app.title("FOCUSS APPLICATION")
+    # app.attributes("-fullscreen", True)
     screen_width = app.winfo_screenwidth()
     screen_height = app.winfo_screenheight()
 
@@ -181,14 +209,14 @@ def create_gui():
     
 
       # common buttons
-    exit_button = tk.Button(app, text=" X ", command=app.destroy, bg="red", fg="white")
-    exit_button.place(x=(screen_width - 50), y=10)
-    # Minimize button
-    minimize_button = tk.Button(app, text=" _ ", command=app.iconify, bg="blue", fg="white")
-    minimize_button.place(x=(screen_width - 85), y=10)
+    # exit_button = tk.Button(app, text=" X ", command=app.destroy, bg="red", fg="white")
+    # exit_button.place(x=(screen_width - 50), y=10)
+    # # Minimize button
+    # minimize_button = tk.Button(app, text=" _ ", command=app.iconify, bg="blue", fg="white")
+    # minimize_button.place(x=(screen_width - 85), y=10)
 
-    upload_button = tk.Button(app, text=" Upload ",  command=lambda: handle_upload(), bg="black", fg="white")
-    upload_button.place(x=(screen_width - 150), y=10)
+    # upload_button = tk.Button(app, text=" Upload ",  command=lambda: handle_upload(), bg="black", fg="white")
+    # upload_button.place(x=(screen_width - 150), y=10)
 
 
     app.mainloop()
