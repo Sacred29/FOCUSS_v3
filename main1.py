@@ -12,6 +12,7 @@ from tkcalendar import DateEntry
 from heatmap_functions import display_heatmap
 from count_functions import count_overall, all_high_pressure_tables
 from trends_functions import display_trends
+from overview_functions import display_raw_data
 from threading import Thread
 import threading
 import socket
@@ -136,6 +137,7 @@ def initialize_database(DB_PATH):
 
 def create_gui():
     app = tk.Tk()
+    
     # app.iconbitmap("assets/icon.ico")
     app.title("FOCUSS APPLICATION")
     app.attributes("-fullscreen", True)
@@ -164,6 +166,7 @@ def create_gui():
 
     
     # display_count(screen_width, screen_height, tab3, DB_PATH)
+    display_raw_data(tab1, DB_PATH)
     count_overall(screen_width, screen_height, tab2, DB_PATH)
     all_high_pressure_tables(screen_width, screen_height, tab3, DB_PATH)
     display_trends(screen_width, screen_height, tab4, DB_PATH)

@@ -8,7 +8,7 @@ import time
 import calendar
 import os
 
-def export_to_csv(df):
+def export_to_csv(df, func):
         """Export the DataFrame to the Downloads folder."""
         if df.empty:
             messagebox.showwarning("Warning", "No data available to export.")
@@ -16,7 +16,8 @@ def export_to_csv(df):
 
         # Get the Downloads folder path
         downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
-        file_name = "exported_data.csv"  # Default file name
+        timestamp = datetime.now().strftime("%d-%b-%y-%H-%M-%S")
+        file_name = f"{func}_{timestamp}.csv"  # Default file name
         file_path = os.path.join(downloads_folder, file_name)
 
         # Save the DataFrame to the Downloads folder
@@ -26,29 +27,12 @@ def export_to_csv(df):
         except Exception as e:
             messagebox.showerror("Error", f"Failed to export data: {e}")
 
-def update_export_button(df, button):
+def update_export_button(df, button, function):
         """Update the export button with the latest DataFrame."""
         if df.empty:
             button.config(state=tk.DISABLED)  # Disable if no data
         else:
-            button.config(state=tk.NORMAL, command=lambda: export_to_csv(df))
-
-# def display_count(screen_width, screen_height, tab, DB_PATH):
-#     sub_notebook = ttk.Notebook(tab)
-#     sub_notebook.pack(fill=tk.BOTH, expand=True)
-
-#     # Sub-tabs in tab3
-#     sub_tab1 = ttk.Frame(sub_notebook)
-#     sub_tab2 = ttk.Frame(sub_notebook)
-
-#     sub_notebook.add(sub_tab1, text="Overview")
-#     sub_notebook.add(sub_tab2, text="High Pressure Timestamps")
-
-    
-#     count_overall(screen_width, screen_height, sub_tab1, DB_PATH)
-#     all_high_pressure_tables(screen_width, screen_height, sub_tab2, DB_PATH)
-
-
+            button.config(state=tk.NORMAL, command=lambda: export_to_csv(df, function))
 
 def count_overall(screen_width, screen_height, tab, DB_PATH):
     def show_table(tab, start_date_picker, end_date_picker, DB_PATH):
@@ -85,7 +69,7 @@ def count_overall(screen_width, screen_height, tab, DB_PATH):
         df_pivot = df_pivot.reindex(desired_order)
 
         df_export = df_pivot.reset_index() 
-        update_export_button(df_export, export_button)  # Update export button
+        update_export_button(df_export, export_button, "Summary")  # Update export button
 
         # Configure grid for Treeviews
         tab.rowconfigure(1, weight=1)
@@ -442,7 +426,7 @@ def all_high_pressure_tables(screen_width, screen_height, tab, DB_PATH):
         df_export = df
         df_export['Timestamp'] = " " + df_export['Timestamp']
 
-        update_export_button(df_export, export_button)
+        update_export_button(df_export, export_button, "High Timestamps")
         
 
         table_frame = ttk.Frame(tab)
