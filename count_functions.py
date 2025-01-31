@@ -6,6 +6,32 @@ from tkcalendar import DateEntry
 from datetime import datetime, timedelta
 import time
 import calendar
+import os
+
+def export_to_csv(df):
+        """Export the DataFrame to the Downloads folder."""
+        if df.empty:
+            messagebox.showwarning("Warning", "No data available to export.")
+            return
+
+        # Get the Downloads folder path
+        downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
+        file_name = "exported_data.csv"  # Default file name
+        file_path = os.path.join(downloads_folder, file_name)
+
+        # Save the DataFrame to the Downloads folder
+        try:
+            df.to_csv(file_path, index=False)
+            messagebox.showinfo("Success", f"Data exported successfully to:\n{file_path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to export data: {e}")
+
+def update_export_button(df, button):
+        """Update the export button with the latest DataFrame."""
+        if df.empty:
+            button.config(state=tk.DISABLED)  # Disable if no data
+        else:
+            button.config(state=tk.NORMAL, command=lambda: export_to_csv(df))
 
 # def display_count(screen_width, screen_height, tab, DB_PATH):
 #     sub_notebook = ttk.Notebook(tab)
@@ -21,7 +47,8 @@ import calendar
     
 #     count_overall(screen_width, screen_height, sub_tab1, DB_PATH)
 #     all_high_pressure_tables(screen_width, screen_height, sub_tab2, DB_PATH)
-    
+
+
 
 def count_overall(screen_width, screen_height, tab, DB_PATH):
     def show_table(tab, start_date_picker, end_date_picker, DB_PATH):
@@ -35,8 +62,6 @@ def count_overall(screen_width, screen_height, tab, DB_PATH):
         end_date = datetime.combine(end_date, datetime.min.time())
         # end_timestamp = int(time.mktime((end_date + timedelta(days=1)).timetuple())) * 1000
         end_timestamp = calendar.timegm((end_date + timedelta(days=1)).timetuple()) * 1000 
-
-        print(start_timestamp)
 
         # Fetch data
         df = fetch_count_overall(start_timestamp, end_timestamp, DB_PATH)
@@ -58,6 +83,9 @@ def count_overall(screen_width, screen_height, tab, DB_PATH):
         # Reorder DF
         desired_order = ["IDLE", "LOW", "MEDIUM", "HIGH", "PERCENTAGE OF HIGH COUNTS/TOTAL ACTIVE DATA (%)"]
         df_pivot = df_pivot.reindex(desired_order)
+
+        df_export = df_pivot.reset_index() 
+        update_export_button(df_export, export_button)  # Update export button
 
         # Configure grid for Treeviews
         tab.rowconfigure(1, weight=1)
@@ -130,6 +158,11 @@ def count_overall(screen_width, screen_height, tab, DB_PATH):
     # Submit Button
     submit_button = tk.Button(control_frame, text="Show Table", command=lambda: show_table(tab, start_date_picker, end_date_picker, DB_PATH))
     submit_button.grid(row=0, column=4, sticky="w", padx=5, pady=5)
+    
+    export_button = tk.Button(control_frame, text="Export CSV", state=tk.DISABLED)
+    export_button.grid(row=0, column=5, sticky="w", padx=5, pady=5)
+
+    
 
 
 def fetch_count_overall(start_timestamp, end_timestamp, DB_PATH ):
@@ -329,6 +362,9 @@ def all_high_pressure_tables(screen_width, screen_height, tab, DB_PATH):
     submit_button = tk.Button(date_picker_frame, text="Show Table", command=lambda: show_table())
     submit_button.grid(row=0, column=4, sticky="w", padx=5)
 
+    export_button = tk.Button(date_picker_frame, text="Export CSV", state=tk.DISABLED)
+    export_button.grid(row=0, column=5, sticky="w", padx=5, pady=5)
+
     # Checkboxes
     def select_all(): 
         """Select all checkboxes."""
@@ -403,6 +439,11 @@ def all_high_pressure_tables(screen_width, screen_height, tab, DB_PATH):
         df = fetch_all_high_pressure(start_timestamp, end_timestamp, DB_PATH, selected_columns)
         df['Timestamp'] = pd.to_datetime(df['Timestamp'], unit='ms')
         df['Timestamp'] = df['Timestamp'].dt.strftime('%d-%b-%Y %H:%M:%S.%f')
+        df_export = df
+        df_export['Timestamp'] = " " + df_export['Timestamp']
+
+        update_export_button(df_export, export_button)
+        
 
         table_frame = ttk.Frame(tab)
         table_frame.grid(row=1, column=0, sticky="nsew")

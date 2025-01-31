@@ -153,67 +153,6 @@ def display_heatmap(screen_width, screen_height, tab, DB_PATH):
     heatmap_slider.grid(row=1, column=1, sticky="w")  # No padding, directly adjacent
 
 
-
-
-# # Heatmap Functions
-# def update_bubbles(timestamp, canvas, DB_PATH):
-
-#     results = fetch_filtered_data(timestamp, DB_PATH)
-
-#     canvas_width = canvas.winfo_width()
-#     canvas_height = canvas.winfo_height()
-
-#     bubble_locations = [
-#         (int(canvas_width * 0.13), int(canvas_height * 0.12), "Left_FF1"),  # Left_FF1
-#         (int(canvas_width * 0.207), int(canvas_height * 0.09), "Left_FF2"), # Left_FF2
-#         (int(canvas_width * 0.288), int(canvas_height * 0.09), "Left_FF3"),  # Left_FF3
-#         (int(canvas_width * 0.368), int(canvas_height * 0.12), "Left_FF4"),  # Left_FF4
-#         (int(canvas_width * 0.145), int(canvas_height * 0.335), "Left_MF5"), # Left_MF5
-#         (int(canvas_width * 0.197), int(canvas_height * 0.4), "Left_MF6"), # Left_MF6
-#         (int(canvas_width * 0.246), int(canvas_height * 0.335), "Left_MF7"), # Left_MF7
-#         (int(canvas_width * 0.3), int(canvas_height * 0.4), "Left_MF8"), # Left_MF8
-#         (int(canvas_width * 0.35), int(canvas_height * 0.335), "Left_MF9"), # Left_MF9
-#         (int(canvas_width * 0.177), int(canvas_height * 0.65), "Left_RF10"), # Left_RF10
-#         (int(canvas_width * 0.25), int(canvas_height * 0.6), "Left_RF11"), # Left_RF11
-#         (int(canvas_width * 0.325), int(canvas_height * 0.645), "Left_RF12"), # Left_RF12
-#         (int(canvas_width * 0.248), int(canvas_height * 0.79), "Left_RF13"), # Left_RF13
-
-#         (int(canvas_width * (0.13 + 0.5)), int(canvas_height * 0.12), "Right_FF1"),  # Right_FF1
-#         (int(canvas_width * (0.207 + 0.5)), int(canvas_height * 0.09), "Right_FF2"), # Right_FF2
-#         (int(canvas_width * (0.288 + 0.5)), int(canvas_height * 0.09), "Right_FF3"),  # Right_FF3
-#         (int(canvas_width * (0.368 + 0.5)), int(canvas_height * 0.12), "Right_FF4"),  # Right_FF4
-#         (int(canvas_width * (0.145 + 0.5)), int(canvas_height * 0.335), "Right_MF5"), # Right_MF5
-#         (int(canvas_width * (0.197 + 0.5)), int(canvas_height * 0.4), "Right_MF6"), # Right_MF6
-#         (int(canvas_width * (0.246 + 0.5)), int(canvas_height * 0.335), "Right_MF7"), # Right_MF7
-#         (int(canvas_width * (0.3 + 0.5)), int(canvas_height * 0.4), "Right_MF8"), # Right_MF8
-#         (int(canvas_width * (0.35 + 0.5)), int(canvas_height * 0.335), "Right_MF9"), # Right_MF9
-#         (int(canvas_width * (0.177 + 0.5)), int(canvas_height * 0.65), "Right_RF10"), # Right_RF10
-#         (int(canvas_width * (0.25 + 0.5)), int(canvas_height * 0.6), "Right_RF11"), # Right_RF11
-#         (int(canvas_width * (0.325 + 0.5)), int(canvas_height * 0.645), "Right_RF12"), # Right_RF12
-#         (int(canvas_width * (0.248 + 0.5)), int(canvas_height * 0.79), "Right_RF13"), # Right_RF13
-#     ]
-
-#     for x, y, name in bubble_locations:
-#         if name in results.columns:
-#             value = results[name].iloc[0]  # Extract the scalar value from the first row
-
-#             # Handle cases where the value is None or missing
-#             if pd.isna(value) or value is None:
-#                 color = "grey"
-#             elif value < 15:
-#                 color = "grey"
-#             elif 15 <= value < 151:
-#                 color = "green"
-#             elif 151 <= value < 350:
-#                 color = "yellow"
-#             else:
-#                 color = "red"
-
-#             # Draw the bubble
-#             canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill=color, outline="")
-#             canvas.create_text(x, y + 25, text=name, font=("Arial", 8), fill="black")
-
-
 def update_bubbles(timestamp, canvas, DB_PATH):
     # Clear all bubbles (but keep the images)
     canvas.delete("bubble")
