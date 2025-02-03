@@ -22,6 +22,17 @@ if os.name == "nt":  # For Windows
 else:  # For Unix-based systems (Linux/Mac)
     DB_PATH = os.path.join(os.path.expanduser("~"), "FOCUSS", "foot_data.db")
 
+def refresh_heatmap():
+    global tab5, screen_width, screen_height
+
+    # Clear the current widgets in the heatmap tab
+    for widget in tab5.winfo_children():
+        widget.destroy()
+
+    # Redraw the heatmap
+    display_heatmap(screen_width, screen_height, tab5, DB_PATH)
+
+
 def handle_upload():
     # Open a folder selection dialog
     folder_path = filedialog.askdirectory(title="Select Folder")
@@ -35,6 +46,7 @@ def handle_upload():
     try:
         process_folder(folder_path)
         messagebox.showinfo("Success", f"Data from {folder_path} has been processed and stored in SQLite.")
+        refresh_heatmap()
     except Exception as e:
         # Show error message if something goes wrong
         messagebox.showerror("Error", f"Failed to process folder: {e}")
@@ -136,7 +148,7 @@ def initialize_database(DB_PATH):
 
 
 def create_gui():
-
+    global tab5, screen_width, screen_height
     app = tk.Tk()
     app.title("FOCUSS APPLICATION")
     app.geometry("1200x700")  # Initial window size

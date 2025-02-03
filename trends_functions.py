@@ -145,8 +145,8 @@ def get_trend(tab, DB_PATH):
         
     
         ax.xaxis.set_major_locator(HourLocator(interval=max(1, int(duration_dropdown.get()) // 12)))  # Show label every hour for <= 12 hours. else every 2 hours
-        ax.xaxis.set_major_formatter(DateFormatter('%d-%b-%y %H:%M'))  # Format as HH:MM
-        ax.tick_params(axis='x', rotation=45) 
+        ax.xaxis.set_major_formatter(DateFormatter('%d-%b-%y \n %H:%M'))  # Format as HH:MM
+        ax.tick_params(axis='x', rotation=45, labelsize = 10) 
         ax.set_xlim(pd.to_datetime(start_timestamp, unit='ms'), pd.to_datetime(end_timestamp, unit='ms'))  # Set x-axis range
         ax.set_xlabel("Time")
         ax.set_ylabel("Sensor Value (kPa)")
@@ -179,10 +179,7 @@ def get_trend(tab, DB_PATH):
             messagebox.showinfo("Success", f"Graph saved in {file_path}")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save graph: {e}")
-        # export_button = tk.Button(date_picker_frame, text="Export Graph to Downloads", command=save_graph)
-        # # export_button.grid(row=2, column=0, sticky="e", padx=10, pady=10)
-        # # export_button.pack(side="left", padx=5, pady=5)
-        # export_button.grid(row=0, column=6, sticky="e", padx=5, pady=5)
+        
         
 
         
