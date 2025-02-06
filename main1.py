@@ -57,6 +57,10 @@ def process_folder(base_folder):
     left_foot_dir = os.path.join(base_folder, "Left Foot")
     right_foot_dir = os.path.join(base_folder, "Right Foot")
 
+    # Convert XLSX to CSV before processing
+    convert_xlsx_to_csv(left_foot_dir)
+    convert_xlsx_to_csv(right_foot_dir)
+
     # Combine CSV files
     left_foot_data = combine_csv_files(left_foot_dir)
     right_foot_data = combine_csv_files(right_foot_dir)
@@ -65,28 +69,150 @@ def process_folder(base_folder):
     save_to_sqlite(left_foot_data, "LeftFootData")
     save_to_sqlite(right_foot_data, "RightFootData")
 
+# def convert_xlsx_to_csv(directory):
+#     for file_name in os.listdir(directory):
+#         if file_name.endswith(".xlsx"):
+#             file_path = os.path.join(directory, file_name)
+#             csv_path = os.path.splitext(file_path)[0] + ".csv"
+#             try:
+#                 df = pd.read_excel(file_path, dtype=str)  # Read as string to preserve formatting
+#                 df.to_csv(csv_path, index=False)
+                
+#                 # Delete the .xlsx file after successful conversion
+#                 os.remove(file_path)
+
+#                 print(f"Deleted: {file_path}")
+#             except Exception as e:
+#                 print(f"Error converting {file_name} to CSV: {e}")
+
+
+def convert_xlsx_to_csv(directory):
+    for file_name in os.listdir(directory):
+        if file_name.endswith(".xlsx"):
+            file_path = os.path.join(directory, file_name)
+            csv_path = os.path.splitext(file_path)[0] + ".csv"
+
+            try:
+                # Read Excel file as string to prevent formatting issues
+                df = pd.read_excel(file_path, dtype=str)
+
+                # Convert Timestamp to float64
+                if "Timestamp" in df.columns:
+                    df["Timestamp"] = pd.to_numeric(df["Timestamp"], errors="coerce").astype("float64")
+
+                # Convert other sensor columns to int64
+                sensor_columns = [col for col in df.columns if col != "Timestamp"]
+                for col in sensor_columns:
+                    df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype("int64")
+
+                # Save the cleaned data to CSV
+                df.to_csv(csv_path, index=False)
+
+                # Delete the original .xlsx file
+                os.remove(file_path)
+                print(f"Converted and deleted: {file_path}")
+
+            except Exception as e:
+                print(f"Error converting {file_name} to CSV: {e}")
 
 def combine_csv_files(directory):
-    combined_df = pd.DataFrame()
+    combined_df = pd.DataFrame()  # Initialize an empty DataFrame
     for file_name in os.listdir(directory):
         if file_name.endswith(".csv"):
             file_path = os.path.join(directory, file_name)
-            df = pd.read_csv(file_path)
-            
-            # Ensure the Timestamp column exists and process it
-            if "Timestamp" not in df.columns:
-                raise KeyError(f"'Timestamp' column missing in file: {file_name}")
-            df["Timestamp"] = pd.to_numeric(df["Timestamp"], errors="coerce") // 10  # Divide Timestamp by 10
-            
-            combined_df = pd.concat([combined_df, df], ignore_index=True)
+            try:
+                # Read the CSV file into a DataFrame
+                df = pd.read_csv(file_path, dtype=str)  # Read as string to preserve formatting
+
+                # Ensure the Timestamp column exists and process it
+                if "Timestamp" not in df.columns:
+                    raise KeyError(f"'Timestamp' column missing in file: {file_name}")
+                df["Timestamp"] = pd.to_numeric(df["Timestamp"], errors="coerce") // 10  # Divide Timestamp by 10
+
+                sensor_columns = [col for col in df.columns if col != "Timestamp"]
+                for col in sensor_columns:
+                    df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype("int64")
+
+                # Replace NaN/None values with 0
+                df = df.fillna(0)
+
+                # Combine the current file's DataFrame with the main DataFrame
+                combined_df = pd.concat([combined_df, df], ignore_index=True)
+            except Exception as e:
+                print(f"Error processing file {file_name}: {e}")
     return combined_df
+
+# def combine_csv_files(directory):
+#     combined_df = pd.DataFrame()
+#     for file_name in os.listdir(directory):
+#         if file_name.endswith(".csv"):
+#             file_path = os.path.join(directory, file_name)
+#             try:
+#                 df = pd.read_csv(file_path, dtype=str)  # Read as string to preserve large numbers
+
+#                 # Ensure the Timestamp column exists and process it
+#                 if "Timestamp" not in df.columns:
+#                     raise KeyError(f"'Timestamp' column missing in file: {file_name}")
+#                 df["Timestamp"] = pd.to_numeric(df["Timestamp"], errors="coerce") // 10  # Divide Timestamp by 10
+                
+#                 df = df.fillna(0)
+
+#                 combined_df = pd.concat([combined_df, df], ignore_index=True)
+#             except Exception as e:
+#                 print(f"Error processing file {file_name}: {e}")
+#     return combined_df
+
+# def convert_xlsx_to_csv(directory):
+#     for file_name in os.listdir(directory):
+#         print("hello1")
+#         if file_name.endswith(".xlsx"):
+#             file_path = os.path.join(directory, file_name)
+#             csv_path = os.path.splitext(file_path)[0] + ".csv"
+#             df = pd.read_excel(file_path, dtype=str)  # Read as string to preserve formatting
+#             df.to_csv(csv_path, index=False)
+
+# def process_folder(base_folder):
+#     # Paths for Left Foot and Right Foot directories
+#     left_foot_dir = os.path.join(base_folder, "Left Foot")
+#     right_foot_dir = os.path.join(base_folder, "Right Foot")
+
+#      # Convert XLSX to CSV before processing
+#     convert_xlsx_to_csv(left_foot_dir)
+#     convert_xlsx_to_csv(right_foot_dir)
+
+#     # Combine CSV files
+#     left_foot_data = combine_csv_files(left_foot_dir)
+#     right_foot_data = combine_csv_files(right_foot_dir)
+
+#     # Save to SQLite
+#     save_to_sqlite(left_foot_data, "LeftFootData")
+#     save_to_sqlite(right_foot_data, "RightFootData")
+
+
+# def combine_csv_files(directory):
+#     combined_df = pd.DataFrame()
+#     for file_name in os.listdir(directory):
+#         if file_name.endswith(".csv"):
+#             file_path = os.path.join(directory, file_name)
+#             df = pd.read_csv(file_path)
+            
+#             # Ensure the Timestamp column exists and process it
+#             if "Timestamp" not in df.columns:
+#                 raise KeyError(f"'Timestamp' column missing in file: {file_name}")
+#             df["Timestamp"] = pd.to_numeric(df["Timestamp"], errors="coerce") // 10  # Divide Timestamp by 10
+            
+#             combined_df = pd.concat([combined_df, df], ignore_index=True)
+#     return combined_df
 
 
 def save_to_sqlite(df, table_name):
-    print("Before processing columns:", df.columns.tolist())
-    # df.columns = df.columns.str.replace(" ", "")
+    print(df)
+    # Assuming df is your DataFrame
+    first_row = df[" FF1"].iloc[0]  # Access the first row
+    print(type(first_row))  # Check the type of the first row
+    print(df[" FF1"].unique())
+
     df.columns = df.columns.map(str).str.replace(" ", "")
-    print("Before processing columns:", df.columns.tolist())
     with sqlite3.connect(DB_PATH) as conn:
         df.to_sql(table_name, conn, if_exists="replace", index=False)
         conn.commit() 
